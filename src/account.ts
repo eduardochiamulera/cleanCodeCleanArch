@@ -15,7 +15,7 @@ export default class Account{
                 if(!this.name.match(/[a-zA-Z] [a-zA-Z]+/)) throw new Error("Invalid name");
                 if (!this.email.match(/^(.+)@(.+)$/)) throw new Error("Invalid email");
                 if(!validateCpf(cpf)) throw new Error("Invalid cpf");
-                if(this.isDriver && !this.carPlate.match(/[A-Z]{3}[0-9]{4}/)) throw new Error("Invalid carPlate");
+                if(this.isDriver && !this.carPlate.match(/[A-Z]{3}[0-9]{4}/)) throw new Error("Invalid car plate");
             }
 
     static Create(name: string, email: string, cpf: string, carPlate: string, password: string, isPassenger: boolean, isDriver: boolean){

@@ -1,4 +1,4 @@
-import AccountRepository from "./AccountRepository";
+import AccountRepository from "./accountRepository";
 
 export default class GetByEmail{
     constructor(readonly accountRepository: AccountRepository){
@@ -6,7 +6,10 @@ export default class GetByEmail{
     }
 
     async executeAsync(input: string) {
+        
         const account = await this.accountRepository.getByEmail(input);
+        
+        if(!account) return undefined;
 
         return {
             accountId: account?.accountId,

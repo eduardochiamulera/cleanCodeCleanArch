@@ -1,5 +1,5 @@
 import Account from "./account";
-import AccountRepository from "./AccountRepository";
+import AccountRepository from "./accountRepository";
 
 export default class SaveAccount {
 

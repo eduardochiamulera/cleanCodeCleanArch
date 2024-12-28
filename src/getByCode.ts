@@ -1,4 +1,4 @@
-import AccountRepository from "./AccountRepository";
+import AccountRepository from "./accountRepository";
 
 export default class GetByCode{
     constructor(readonly accountRepository: AccountRepository){
