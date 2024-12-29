@@ -1,46 +1,23 @@
-import express, { Request, Response } from "express";
-import GetByEmail from "./getByEmail";
-import SaveAccount from "./saveAccount";
-import { AccountRepositoryDatabase } from "./accountRepository";
-import GetByCode from "./getByCode";
+import crypto from "crypto";
+import { validateCpf } from "./validateCpf";
+import AccountDAO from "./accountDAO";
 
-const app = express();
-app.use(express.json());
+export default class Signup {
 
-const accountRepository = new AccountRepositoryDatabase();
-const getbyEmail = new GetByEmail(accountRepository);
-const saveAccount = new SaveAccount(accountRepository);
-const getbyCode = new GetByCode(accountRepository);
+	constructor (readonly accountDAO: AccountDAO) {
+	}
 
-app.post("/signup", async function (req: Request, res: Response) {
-    try {
-        const input = req.body;
-        const accountExists = await getbyEmail.executeAsync(input.email);
-        if (accountExists) {
-            res.status(422).json({ message: "Email already in use" });  
-            return;
-        } 
-        const account = {
-            name: input.name,
-            email: input.email,
-            cpf: input.cpf,
-            carPlate: input.carPlate,
-            password: input.password,
-            isPassenger: input.isPassenger,
-            isDriver: input.isDriver,
-        };
-        await saveAccount.executeAsync(account);
-        const insertedAccount = await getbyEmail.executeAsync(input.email);
-        res.json({ accountId: insertedAccount?.accountId });  
-    } catch (error: any) {
-        res.status(422).json({ message: error.message });
-    }
-});
-
-app.get("/accounts/:accountId", async function (req: Request, res: Response) {
-	const accountId = req.params.accountId;
-    const output = await getbyCode.executeAsync(accountId);
-    res.json(output);  
-});
-
-app.listen(3000);
+	async execute (input: any) {
+		input.accountId = crypto.randomUUID();
+		const accountData = await this.accountDAO.getAccountByEmail(input.email);
+		if (accountData) throw new Error("Duplicated account");
+		if (!input.name.match(/[a-zA-Z] [a-zA-Z]+/)) throw new Error("Invalid name");
+		if (!input.email.match(/^(.+)@(.+)$/)) throw new Error("Invalid email");
+		if (!validateCpf(input.cpf)) throw new Error("Invalid cpf")
+		if (input.isDriver && !input.carPlate.match(/[A-Z]{3}[0-9]{4}/)) throw new Error("Invalid car plate");
+		await this.accountDAO.saveAccount(input);
+		return {
+			accountId: input.accountId
+		};
+	}
+}

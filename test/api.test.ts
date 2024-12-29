@@ -1,18 +1,8 @@
-import { AccountDAODatabase, AccountDAOMemory } from "../src/accountDAO";
-import GetAccount from "../src/getAccount";
-import Signup from "../src/signup";
+import axios from "axios";
 
-let signup: Signup;
-let getAccount: GetAccount;
-
-beforeEach(() => {
-	const accountDAO = new AccountDAODatabase();
-	// fake
-	// const accountDAO = new AccountDAOMemory();
-	// fake
-	signup = new Signup(accountDAO);
-	getAccount = new GetAccount(accountDAO);
-});
+axios.defaults.validateStatus = function(){
+    return true;
+}
 
 test("Deve criar a conta de um passageiro", async function(){
     const input = {
@@ -23,10 +13,12 @@ test("Deve criar a conta de um passageiro", async function(){
         isPassenger: true,
         isDriver: false,
     };
-    const response = await signup.execute(input);
-    expect(response.accountId).toBeDefined();
+    const response = await axios.post("http://localhost:3000/signup", input);
+    const outputSignup = response.data;
+    expect(outputSignup.accountId).toBeDefined();
 
-    const outputGetAccount = await getAccount.execute(response.accountId); 
+    const responseGetAccount = await axios.get(`http://localhost:3000/accounts/${outputSignup.accountId}`); 
+    const outputGetAccount = responseGetAccount.data;
     expect(outputGetAccount.name).toBe(input.name);
     expect(outputGetAccount.email).toBe(input.email);
     expect(outputGetAccount.cpf).toBe(input.cpf);
@@ -42,7 +34,9 @@ test("Não Deve criar a conta de um passageiro com nome inválido", async functi
         isPassenger: true,
         isDriver: false,
     };
-    await expect(() => signup.execute(input)).rejects.toThrow(new Error("Invalid name"));
+    const response = await axios.post("http://localhost:3000/signup", input);
+    expect(response.status).toBe(422);    
+    expect(response.data.message).toBe("Invalid name");
 });
 
 test("Não Deve criar a conta de um passageiro com email inválido", async function(){
@@ -54,7 +48,9 @@ test("Não Deve criar a conta de um passageiro com email inválido", async funct
         isPassenger: true,
         isDriver: false,
     };
-    await expect(() => signup.execute(input)).rejects.toThrow(new Error("Invalid email"));
+    const response = await axios.post("http://localhost:3000/signup", input);
+    expect(response.status).toBe(422);
+    expect(response.data.message).toBe("Invalid email");
 });
 
 test("Não Deve criar a conta de um passageiro com cpf inválido", async function(){
@@ -66,7 +62,9 @@ test("Não Deve criar a conta de um passageiro com cpf inválido", async functio
         isPassenger: true,
         isDriver: false,
     };
-    await expect(() => signup.execute(input)).rejects.toThrow(new Error("Invalid cpf"));
+    const response = await axios.post("http://localhost:3000/signup", input);
+    expect(response.status).toBe(422);
+    expect(response.data.message).toBe("Invalid cpf");
 });
 
 test("Não Deve criar a conta de um passageiro duplicado", async function(){
@@ -78,8 +76,10 @@ test("Não Deve criar a conta de um passageiro duplicado", async function(){
         isPassenger: true,
         isDriver: false,
     };
-    await signup.execute(input);
-    await expect(() => signup.execute(input)).rejects.toThrow(new Error("Duplicated account"));
+    await axios.post("http://localhost:3000/signup", input);
+    const response = await axios.post("http://localhost:3000/signup", input);
+    expect(response.status).toBe(422);
+    expect(response.data.message).toBe('Duplicated account');
 });
 
 test("Não Deve criar a conta de um motorista com placa invalida", async function(){
@@ -92,5 +92,8 @@ test("Não Deve criar a conta de um motorista com placa invalida", async functio
         isDriver: true,
         carPlate: "AAA999"
     };
-    await expect(() => signup.execute(input)).rejects.toThrow(new Error("Invalid car plate"));
+    await axios.post("http://localhost:3000/signup", input);
+    const response = await axios.post("http://localhost:3000/signup", input);
+    expect(response.status).toBe(422);
+    expect(response.data.message).toBe("Invalid car plate");
 });
