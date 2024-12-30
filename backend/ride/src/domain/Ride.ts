@@ -59,4 +59,8 @@ export default class Ride{
         this.driverId = new UUID(driverId);
         this.status = "accepted";
     }
+
+    setStatus(status: string){
+        this.status = status;
+    }
 }
