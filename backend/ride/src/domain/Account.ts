@@ -1,4 +1,6 @@
-import { cp } from "fs";
+
+//Design Patter - Facade
+
 import CarPlate from "./CarPlate";
 import Cpf from "./Cpf";
 import Email from "./Email";
@@ -6,7 +8,7 @@ import Name from "./Name";
 import Password from "./Password";
 import UUID from "./UUID";
 
-//Design Patter - Facade
+//Entity
 export default class Account{
 
     private accountId: UUID;

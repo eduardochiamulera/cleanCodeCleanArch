@@ -29,7 +29,6 @@ export function inject(name: string){
         target[propertyKey] = new Proxy({},{
             get(target: any, propertyKey: string){
                 const dependency = Regestry.getInstance().inject(name);
-                console.log("DECORATOR", dependency);
                 return dependency[propertyKey];
             }
         });

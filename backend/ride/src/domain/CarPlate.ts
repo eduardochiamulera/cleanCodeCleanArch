@@ -1,16 +1,14 @@
-export default class UUID{
+//Entity
+export default class CarPlate {
     private value: string;
 
     constructor(value: string){
+        if(!value.match(/[A-Z]{3}[0-9]{4}/)) throw new Error("Invalid car plate");
         this.value = value;
-    }
-
-    static create(){
-        const uuid = crypto.randomUUID();
-        return new UUID(uuid);
     }
 
     getValue(){
         return this.value;
     }
+
 }

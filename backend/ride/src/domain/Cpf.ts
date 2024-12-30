@@ -1,7 +1,7 @@
 const CPF_VALID_LENGTH = 11;
 const FIRST_DIGIT_FACTOR = 10;
 const SECOND_DIGIT_FACTOR = 11;
-
+//Entity
 export default class Cpf{
     private value: string;
 

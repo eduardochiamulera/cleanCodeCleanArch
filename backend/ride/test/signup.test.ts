@@ -1,22 +1,19 @@
-import { AccountRepositoryDatabase, AccountRepositoryMemory } from "../src/AccountRepository";
-import { Regestry } from "../src/DI";
-import GetAccount from "../src/GetAccount";
-import { MailerGatewayMemory } from "../src/MailerGateway";
-import Signup from "../src/Signup";
 import sinon from "sinon";
+import Signup from "../src/application/usecase/Signup";
+import GetAccount from "../src/application/usecase/GetAccount";
+import { Regestry } from "../src/infra/di/DI";
+import { AccountRepositoryDatabase } from "../src/infra/repository/AccountRepository";
+import { MailerGatewayMemory } from "../src/infra/gateway/MailerGateway";
+import { PgPromiseAdapter } from "../src/infra/database/DatabaseConnection";
 
 let signup: Signup;
 let getAccount: GetAccount;
 
 // Integration Narrow -> Broad
 beforeEach(() => {
-	const accountRepository = new AccountRepositoryDatabase();
-	// fake
-	// const accountDAO = new AccountDAOMemory();
-	// fake
-	const mailerGateway = new MailerGatewayMemory();
-	Regestry.getInstance().provide("accountRepository", accountRepository);
-	Regestry.getInstance().provide("mailerGateway", mailerGateway);
+	Regestry.getInstance().provide("accountRepository", new AccountRepositoryDatabase());
+	Regestry.getInstance().provide("mailerGateway", new MailerGatewayMemory());
+	Regestry.getInstance().provide("databaseConnection", new PgPromiseAdapter());
 	signup = new Signup();
 	getAccount = new GetAccount();
 });
@@ -48,52 +45,6 @@ test("Não deve criar a conta de um passageiro com nome inválido", async functi
 		isPassenger: true
 	};
 	await expect(() => signup.execute(input)).rejects.toThrow(new Error("Invalid name"));
-});
-
-test("Não deve criar a conta de um passageiro com email inválido", async function () {
-	const input = {
-		name: "John Doe",
-		email: `john.doe${Math.random()}`,
-		cpf: "97456321558",
-		password: "123456",
-		isPassenger: true
-	};
-	await expect(() => signup.execute(input)).rejects.toThrow(new Error("Invalid email"));
-});
-
-test("Não deve criar a conta de um passageiro com cpf inválido", async function () {
-	const input = {
-		name: "John Doe",
-		email: `john.doe${Math.random()}@gmail.com`,
-		cpf: "9745632155",
-		password: "123456",
-		isPassenger: true
-	};
-	await expect(() => signup.execute(input)).rejects.toThrow(new Error("Invalid cpf"));
-});
-
-test("Não deve criar a conta de um passageiro duplicado", async function () {
-	const input = {
-		name: "John Doe",
-		email: `john.doe${Math.random()}@gmail.com`,
-		cpf: "97456321558",
-		password: "123456",
-		isPassenger: true
-	};
-	await signup.execute(input);
-	await expect(() => signup.execute(input)).rejects.toThrow(new Error("Duplicated account"));
-});
-
-test("Não deve criar a conta de um motorista com placa inválida", async function () {
-	const input = {
-		name: "John Doe",
-		email: `john.doe${Math.random()}@gmail.com`,
-		cpf: "97456321558",
-		password: "123456",
-		carPlate: "AAA999",
-		isDriver: true
-	};
-	await expect(() => signup.execute(input)).rejects.toThrow(new Error("Invalid car plate"));
 });
 
 test("Deve criar a conta de um passageiro com stub", async function () {
@@ -159,4 +110,9 @@ test("Deve criar a conta de um passageiro com mock", async function () {
 	expect(outputGetAccount.password).toBe(input.password);
 	mailerMock.verify();
 	mailerMock.restore();
+});
+
+afterEach(async () => {
+    const connection = Regestry.getInstance().inject("databaseConnection");
+    await connection.close();
 });

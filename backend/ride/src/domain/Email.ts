@@ -1,8 +1,9 @@
-export default class CarPlate {
+//Entity
+export default class Email {
     private value: string;
 
     constructor(value: string){
-        if(!value.match(/[A-Z]{3}[0-9]{4}/)) throw new Error("Invalid car plate");
+        if(!value.match(/^(.+)@(.+)$/)) throw new Error("Invalid email");
         this.value = value;
     }
 

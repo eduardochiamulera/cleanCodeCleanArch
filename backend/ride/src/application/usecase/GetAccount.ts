@@ -1,5 +1,5 @@
-import AccountRepository from "./AccountRepository";
-import { inject } from "./DI";
+import { inject } from "../../infra/di/DI";
+import AccountRepository from "../../infra/repository/AccountRepository";
 
 export default class GetAccount {
 

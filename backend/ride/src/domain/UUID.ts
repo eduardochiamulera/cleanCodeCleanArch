@@ -1,13 +1,17 @@
-export default class Name{
+//Entity
+export default class UUID {
     private value: string;
 
     constructor(value: string){
-        if(!value.match(/[a-zA-Z] [a-zA-Z]+/)) throw new Error("Invalid name");
         this.value = value;
+    }
+
+    static create(){
+        const uuid = crypto.randomUUID();
+        return new UUID(uuid);
     }
 
     getValue(){
         return this.value;
     }
-
 }

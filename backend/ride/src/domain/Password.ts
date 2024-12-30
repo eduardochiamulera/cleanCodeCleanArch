@@ -1,3 +1,4 @@
+//Entity
 export default class Password {
     private value: string;
 
