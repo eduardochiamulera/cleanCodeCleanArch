@@ -1,4 +1,5 @@
-import { AccountDAODatabase, AccountDAOMemory } from "../src/AccountDAO";
+import { AccountRepositoryDatabase, AccountRepositoryMemory } from "../src/AccountRepository";
+import { Regestry } from "../src/DI";
 import GetAccount from "../src/GetAccount";
 import { MailerGatewayMemory } from "../src/MailerGateway";
 import Signup from "../src/Signup";
@@ -9,13 +10,15 @@ let getAccount: GetAccount;
 
 // Integration Narrow -> Broad
 beforeEach(() => {
-	const accountDAO = new AccountDAODatabase();
+	const accountRepository = new AccountRepositoryDatabase();
 	// fake
 	// const accountDAO = new AccountDAOMemory();
 	// fake
 	const mailerGateway = new MailerGatewayMemory();
-	signup = new Signup(accountDAO, mailerGateway);
-	getAccount = new GetAccount(accountDAO);
+	Regestry.getInstance().provide("accountRepository", accountRepository);
+	Regestry.getInstance().provide("mailerGateway", mailerGateway);
+	signup = new Signup();
+	getAccount = new GetAccount();
 });
 
 test("Deve criar a conta de um passageiro", async function () {
@@ -95,7 +98,7 @@ test("Não deve criar a conta de um motorista com placa inválida", async functi
 
 test("Deve criar a conta de um passageiro com stub", async function () {
 	const mailerStub = sinon.stub(MailerGatewayMemory.prototype, "send").resolves();
-	const getAccountByEmail = sinon.stub(AccountDAODatabase.prototype, "getAccountByEmail").resolves();
+	const getAccountByEmail = sinon.stub(AccountRepositoryDatabase.prototype, "getAccountByEmail").resolves();
 	const input = {
 		name: "John Doe",
 		email: `john.doe@gmail.com`,
