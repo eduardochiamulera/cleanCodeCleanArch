@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { validateCpf } from "./validateCpf";
 import AccountDAO from "./AccountDAO";
 import MailerGateway from "./MailerGateway";
+import Util from "./util";
 
 export default class Signup {
 
@@ -12,8 +13,8 @@ export default class Signup {
 		input.accountId = crypto.randomUUID();
 		const accountData = await this.accountDAO.getAccountByEmail(input.email);
 		if (accountData) throw new Error("Duplicated account");
-		if (!input.name.match(/[a-zA-Z] [a-zA-Z]+/)) throw new Error("Invalid name");
-		if (!input.email.match(/^(.+)@(.+)$/)) throw new Error("Invalid email");
+		if (!Util.validateName(input.name)) throw new Error("Invalid name");
+		if (!Util.validateEmail(input.email)) throw new Error("Invalid email");
 		if (!validateCpf(input.cpf)) throw new Error("Invalid cpf")
 		if (input.isDriver && !input.carPlate.match(/[A-Z]{3}[0-9]{4}/)) throw new Error("Invalid car plate");
 		await this.accountDAO.saveAccount(input);
