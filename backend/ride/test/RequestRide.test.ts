@@ -74,9 +74,27 @@ test("Não deve solicitar uma corrida se a conta não for de um passageiro", asy
 		toLong: -48.522234807851476
     };
     expect(async () => await requestRide.execute(inputRequestRide)).rejects.toThrow(new Error("Account must be from a passenger"));
-   
-   
-   
+});
+
+test("Não deve solicitar uma corrida se tem uma pendente", async function () {
+    const inputSignup = {
+        name: "John Doe",
+        email: `john.doe${Math.random()}@gmail.com`,
+        cpf: "97456321558",
+        password: "123456",
+        isPassenger: true
+    };
+    const outputSignup = await signup.execute(inputSignup);
+    outputSignup.accountId;
+    const inputRequestRide = {
+        passengerId: outputSignup.accountId,
+        fromLat: -27.584905257808835,
+		fromLong: -48.545022195325124,
+		toLat: -27.496887588317275,
+		toLong: -48.522234807851476
+    };
+    await requestRide.execute(inputRequestRide);
+    expect(async () => await requestRide.execute(inputRequestRide)).rejects.toThrow(new Error("Ride already requested"));
 });
 
 afterEach(async () => {

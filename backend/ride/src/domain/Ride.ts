@@ -8,14 +8,16 @@ export default class Ride{
     private passengerId: UUID;
     private status: string;
     private date: Date;
+    private driverId?: UUID;
 
-    constructor(rideId: string, passengerId: string, fromLat: number, fromLong: number, toLat: number, toLong: number, status: string, date: Date){
+    constructor(rideId: string, passengerId: string, fromLat: number, fromLong: number, toLat: number, toLong: number, status: string, date: Date, driverId?: string){
         this.from = new Coord(fromLat, fromLong);
         this.to = new Coord(toLat, toLong);
         this.passengerId = new UUID(passengerId);
         this.rideId = new UUID(rideId);
-        this.status = "requested";
-        this.date = new Date();
+        this.status = status;
+        this.date = date;
+        if(driverId) this.driverId = new UUID(driverId);
     }
     
     static create(passengerId: string, fromLat: number, fromLong: number, toLat: number, toLong: number){
@@ -47,5 +49,14 @@ export default class Ride{
 
     getDate(){
         return this.date
+    }
+
+    getDriverId(){
+        return this.driverId?.getValue() || "";
+    }
+
+    setDriverId(driverId: string){
+        this.driverId = new UUID(driverId);
+        this.status = "accepted";
     }
 }

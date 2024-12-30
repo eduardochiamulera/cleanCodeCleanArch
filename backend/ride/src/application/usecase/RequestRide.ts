@@ -17,6 +17,12 @@ export default class RequestRide {
 
         if(!account.isPassenger) throw new Error("Account must be from a passenger");
 
+        const rides = await this.rideRepository?.getRidesByPassengerId(input.passengerId);
+
+        console.log("RIDES", rides)
+
+        if(rides && rides.some(ride => ride.getStatus() !== "completed")) throw new Error("Ride already requested");
+
         const ride = Ride.create(input.passengerId, input.fromLat, input.fromLong, input.toLat, input.toLong);
 
         await this.rideRepository?.saveRide(ride);
