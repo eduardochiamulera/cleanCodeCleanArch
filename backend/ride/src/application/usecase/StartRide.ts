@@ -1,11 +1,8 @@
+import { RequestedStatus } from "../../domain/vo/RideStatus";
 import { inject } from "../../infra/di/DI";
-import AccountRepository from "../../infra/repository/AccountRepository";
 import RideRepository from "../../infra/repository/RideRepository";
 
 export default class StartRide {
-
-    @inject("accountRepository")
-    accountRepository?: AccountRepository;
     @inject("rideRepository")
     rideRepository?: RideRepository;
 
@@ -14,9 +11,7 @@ export default class StartRide {
 
         if(!ride) throw new Error("Ride not found");
 
-        if(ride.getStatus() !== "accepted") throw new Error("Ride already started");
-
-        ride.setStatus("in_progress");
+        ride.start();
 
         await this.rideRepository?.updateRide(ride);
     }

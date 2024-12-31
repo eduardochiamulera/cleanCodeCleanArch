@@ -20,9 +20,9 @@ export default class AcceptRide {
 
         if(!ride) throw new Error("Ride not found");
 
-        const driverRides = await this.rideRepository?.getRidesByDriverId(input.driverId);
+        //const driverRides = await this.rideRepository?.getRidesByDriverId(input.driverId);
 
-        if(driverRides && driverRides.some(ride => ride.getStatus() === "accepted" || ride.getStatus() === "in_progress")) throw new Error("There is a ride already accepted");
+        //if(driverRides && driverRides.some(ride => ride.getStatus() === "accepted" || ride.getStatus() === "in_progress")) throw new Error("There is a ride already accepted");
 
         ride.accepted(input.driverId);
 

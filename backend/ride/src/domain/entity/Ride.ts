@@ -1,4 +1,5 @@
 import Coord from "../vo/Coord";
+import RideStatus, { RideStatusFactory } from "../vo/RideStatus";
 import UUID from "../vo/UUID";
 
 export default class Ride{
@@ -6,7 +7,7 @@ export default class Ride{
     private from: Coord;
     private to: Coord;
     private passengerId: UUID;
-    private status: string;
+    private status: RideStatus;
     private date: Date;
     private driverId?: UUID;
 
@@ -15,7 +16,7 @@ export default class Ride{
         this.to = new Coord(toLat, toLong);
         this.passengerId = new UUID(passengerId);
         this.rideId = new UUID(rideId);
-        this.status = status;
+        this.status = RideStatusFactory.create(status, this);
         this.date = date;
         if(driverId) this.driverId = new UUID(driverId);
     }
@@ -56,8 +57,15 @@ export default class Ride{
     }
 
     accepted(driverId: string){
-        if(this.getStatus() !== "requested") throw new Error("Invalid status");
         this.driverId = new UUID(driverId);
-        this.status = "accepted";
+        this.status.accept();
+    }
+
+    start(){
+        this.status.start();
+    }
+
+    setStatus(status: RideStatus){
+        this.status = status;
     }
 }
