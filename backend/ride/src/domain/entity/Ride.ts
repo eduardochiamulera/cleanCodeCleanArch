@@ -55,11 +55,9 @@ export default class Ride{
         return this.driverId?.getValue() || "";
     }
 
-    setDriverId(driverId: string){
+    accepted(driverId: string){
+        if(this.getStatus() !== "requested") throw new Error("Invalid status");
         this.driverId = new UUID(driverId);
-    }
-
-    setStatus(status: string){
-        this.status = status;
+        this.status = "accepted";
     }
 }
