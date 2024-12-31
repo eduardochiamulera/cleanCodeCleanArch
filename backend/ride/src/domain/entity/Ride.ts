@@ -1,5 +1,5 @@
-import Coord from "./Coord";
-import UUID from "./UUID";
+import Coord from "../vo/Coord";
+import UUID from "../vo/UUID";
 
 export default class Ride{
     private rideId: UUID;
@@ -57,7 +57,6 @@ export default class Ride{
 
     setDriverId(driverId: string){
         this.driverId = new UUID(driverId);
-        this.status = "accepted";
     }
 
     setStatus(status: string){

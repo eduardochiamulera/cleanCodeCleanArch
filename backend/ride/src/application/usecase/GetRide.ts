@@ -33,5 +33,5 @@ type Output = {
 	toLat: number,
 	toLong: number,
     status: string,
-    driverId: string
+    driverId?: string
 }

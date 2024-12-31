@@ -1,4 +1,4 @@
-import Ride from "../../domain/Ride";
+import Ride from "../../domain/entity/Ride";
 import { inject } from "../../infra/di/DI";
 import AccountRepository from "../../infra/repository/AccountRepository";
 import RideRepository from "../../infra/repository/RideRepository";
@@ -18,8 +18,6 @@ export default class RequestRide {
         if(!account.isPassenger) throw new Error("Account must be from a passenger");
 
         const rides = await this.rideRepository?.getRidesByPassengerId(input.passengerId);
-
-        console.log("RIDES", rides)
 
         if(rides && rides.some(ride => ride.getStatus() !== "completed")) throw new Error("Ride already requested");
 

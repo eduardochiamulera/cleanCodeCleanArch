@@ -1,14 +1,12 @@
+import CarPlate from ".././vo/CarPlate";
+import Cpf from "../vo/Cpf";
+import Email from "../vo/Email";
+import Name from "../vo/Name";
+import Password from "../vo/Password";
+import UUID from "../vo/UUID";
 
-//Design Patter - Facade
-
-import CarPlate from "./CarPlate";
-import Cpf from "./Cpf";
-import Email from "./Email";
-import Name from "./Name";
-import Password from "./Password";
-import UUID from "./UUID";
-
-//Entity
+//Entity - Clean Arch
+//Entity - DDD
 export default class Account{
 
     private accountId: UUID;
@@ -59,4 +57,12 @@ export default class Account{
     getAccountId(){
         return this.accountId.getValue();
     }
+
+    changeName (newName: string) {
+		this.name = new Name(newName);
+	}
+
+	changePassword (newPassword: string) {
+		this.password = new Password(newPassword);
+	}
 }

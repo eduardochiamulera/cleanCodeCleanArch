@@ -1,4 +1,3 @@
-import Ride from "../../domain/Ride";
 import { inject } from "../../infra/di/DI";
 import AccountRepository from "../../infra/repository/AccountRepository";
 import RideRepository from "../../infra/repository/RideRepository";
@@ -21,13 +20,14 @@ export default class AcceptRide {
 
         if(!ride) throw new Error("Ride not found");
 
-        if(ride.getStatus() !== "requested") throw new Error("Ride already accepted");
+        if(ride.getStatus() !== "requested") throw new Error("Invalid status");
 
         const driverRides = await this.rideRepository?.getRidesByDriverId(input.driverId);
 
         if(driverRides && driverRides.some(ride => ride.getStatus() === "accepted" || ride.getStatus() === "in_progress")) throw new Error("There is a ride already accepted");
 
         ride.setDriverId(input.driverId);
+        ride.setStatus("accepted");
 
         await this.rideRepository?.updateRide(ride);
     }

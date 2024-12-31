@@ -1,16 +1,13 @@
 import { inject } from "../../infra/di/DI";
-import AccountRepository from "../../infra/repository/AccountRepository";
 import RideRepository from "../../infra/repository/RideRepository";
 
-export default class StartRide {
-
-    @inject("accountRepository")
-    accountRepository?: AccountRepository;
+export default class UpdatePosition {
+    
     @inject("rideRepository")
     rideRepository?: RideRepository;
 
-    async execute (rideId: string) : Promise<void> {
-        const ride = await this.rideRepository?.getRideById(rideId);
+    async execute (input: Input) : Promise<void> {
+        const ride = await this.rideRepository?.getRideById(input.rideId);
 
         if(!ride) throw new Error("Ride not found");
 
@@ -20,4 +17,10 @@ export default class StartRide {
 
         await this.rideRepository?.updateRide(ride);
     }
+}
+
+type Input = {
+    rideId: string,
+    lat: number,
+    long: number
 }
