@@ -13,8 +13,6 @@ export default interface RideRepository {
 
 // Adapter
 export class RideRepositoryDatabase implements RideRepository {
-	
-	
 	@inject("databaseConnection")
 	connection?: DatabaseConnection;
 

@@ -60,7 +60,6 @@ export class InProgressStatus implements RideStatus{
         throw new Error("Invalid status");
     }
 }
-
 export class RideStatusFactory {
     static create(status: string, ride: Ride){
         if(status === "requested") return new RequestedStatus(ride);
