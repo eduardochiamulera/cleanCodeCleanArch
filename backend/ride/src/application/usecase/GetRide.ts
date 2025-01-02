@@ -16,7 +16,7 @@ export default class GetRide {
 
         const positions = await this.positionRepository?.getPositionsByRideId(rideId);
 
-        const distance = ride.getDistance(positions || []);
+        ride.calculateDistance(positions || []);
 
         return {
             rideId: ride.getRideId(),
@@ -28,7 +28,8 @@ export default class GetRide {
             status: ride.getStatus(),
             driverId: ride.getDriverId(),
             positions: positions || [],
-            distance: distance          
+            distance: ride.getDistance(),
+            fare: ride.getFare(),
         };
     }
 }
@@ -43,5 +44,6 @@ type Output = {
     status: string,
     driverId?: string,
     positions: any[],
-    distance: number
+    distance: number,
+    fare: number,
 }

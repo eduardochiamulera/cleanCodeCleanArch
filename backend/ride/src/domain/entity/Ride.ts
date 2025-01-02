@@ -12,8 +12,10 @@ export default class Ride{
     private status: RideStatus;
     private date: Date;
     private driverId?: UUID;
+    private fare: number;
+    private distance: number;
 
-    constructor(rideId: string, passengerId: string, fromLat: number, fromLong: number, toLat: number, toLong: number, status: string, date: Date, driverId?: string){
+    constructor(rideId: string, passengerId: string, fromLat: number, fromLong: number, toLat: number, toLong: number, status: string, date: Date, fare: number, distance: number, driverId?: string){
         this.from = new Coord(fromLat, fromLong);
         this.to = new Coord(toLat, toLong);
         this.passengerId = new UUID(passengerId);
@@ -21,13 +23,15 @@ export default class Ride{
         this.status = RideStatusFactory.create(status, this);
         this.date = date;
         if(driverId) this.driverId = new UUID(driverId);
+        this.fare = fare;
+        this.distance = distance;
     }
     
     static create(passengerId: string, fromLat: number, fromLong: number, toLat: number, toLong: number){
         const rideId = UUID.create();
         const status = "requested";
         const date = new Date();
-        return new Ride(rideId.getValue(), passengerId, fromLat, fromLong, toLat, toLong, status, date);
+        return new Ride(rideId.getValue(), passengerId, fromLat, fromLong, toLat, toLong, status, date, 0, 0);
     }
 
     getRideId(){
@@ -71,13 +75,27 @@ export default class Ride{
         this.status = status;
     }
 
-    getDistance (positions: Position[]) {
+    calculateDistance (positions: Position[]) {
 		let distance = 0;
 		for (const [index, position] of positions.entries()) {
 			const nextPosition = positions[index + 1];
 			if (!nextPosition) continue;
 			distance += DistanceCalculator.calculate(position.getCoord(), nextPosition.getCoord());
 		}
-		return distance;
+		this.distance = distance;
 	}
+
+    finish(){
+        if(this.status.value !== "in_progress") throw new Error("Invalid status");
+        this.status.finish();
+        this.fare = this.distance * 2.1;
+    }
+
+    getDistance(){
+        return this.distance;
+    }
+
+    getFare(){
+        return this.fare;
+    }
 }

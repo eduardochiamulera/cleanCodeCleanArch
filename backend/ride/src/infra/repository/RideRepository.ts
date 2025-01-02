@@ -19,7 +19,7 @@ export class RideRepositoryDatabase implements RideRepository {
 	async getRideById(rideId: string): Promise<Ride> {
 		const [rideData] = await this.connection?.query("select * from ccca.ride where ride_id = $1", [rideId]);
 		if(!rideData) throw new Error("Ride not found");
-		return new Ride(rideData.ride_id, rideData.passenger_id, parseFloat(rideData.from_lat), parseFloat(rideData.from_long), parseFloat(rideData.to_lat), parseFloat(rideData.to_long), rideData.status, rideData.date, rideData.driver_id);
+		return new Ride(rideData.ride_id, rideData.passenger_id, parseFloat(rideData.from_lat), parseFloat(rideData.from_long), parseFloat(rideData.to_lat), parseFloat(rideData.to_long), rideData.status, rideData.date, parseFloat(rideData.fare), parseFloat(rideData.distance), rideData.driver_id);
 	}
 
 	async saveRide (ride: Ride) {
@@ -29,15 +29,15 @@ export class RideRepositoryDatabase implements RideRepository {
 	}
 
 	async updateRide(ride: Ride): Promise<void> {
-		await this.connection?.query(`update ccca.ride set driver_id = $1, status = $2 where ride_id = $3`, 
-			[ride.getDriverId(), ride.getStatus(), ride.getRideId()]);
+		await this.connection?.query(`update ccca.ride set driver_id = $1, status = $2, distance = $3, fare = $4 where ride_id = $5`, 
+			[ride.getDriverId(), ride.getStatus(), ride.getDistance(), ride.getFare(), ride.getRideId()]);
 	}
 
 	async getRidesByPassengerId(passsengerId: string): Promise<Ride[]> {
 		let rides: Ride[] = [];
 		const ridesData = await this.connection?.query("select * from ccca.ride where passenger_id = $1", [passsengerId]);
 		for(const rideData of ridesData){
-			rides.push(new Ride(rideData.ride_id, rideData.passenger_id, parseFloat(rideData.from_lat), parseFloat(rideData.from_long), parseFloat(rideData.to_lat), parseFloat(rideData.to_long), rideData.status, rideData.date, rideData.driver_id));
+			rides.push(new Ride(rideData.ride_id, rideData.passenger_id, parseFloat(rideData.from_lat), parseFloat(rideData.from_long), parseFloat(rideData.to_lat), parseFloat(rideData.to_long), rideData.status, rideData.date, parseFloat(rideData.fare), parseFloat(rideData.distance), rideData.driver_id));
 		}
 		return rides;
 	}
@@ -46,7 +46,7 @@ export class RideRepositoryDatabase implements RideRepository {
 		let rides: Ride[] = [];
 		const ridesData = await this.connection?.query("select * from ccca.ride where driver_id = $1", [driverId]);
 		for(const rideData of ridesData){
-			rides.push(new Ride(rideData.ride_id, rideData.passenger_id, parseFloat(rideData.from_lat), parseFloat(rideData.from_long), parseFloat(rideData.to_lat), parseFloat(rideData.to_long), rideData.status, rideData.date, rideData.driver_id));
+			rides.push(new Ride(rideData.ride_id, rideData.passenger_id, parseFloat(rideData.from_lat), parseFloat(rideData.from_long), parseFloat(rideData.to_lat), parseFloat(rideData.to_long), rideData.status, rideData.date, parseFloat(rideData.fare), parseFloat(rideData.distance), rideData.driver_id));
 		}
 		return rides;
 	}

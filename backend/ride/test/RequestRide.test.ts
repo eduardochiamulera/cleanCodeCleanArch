@@ -6,6 +6,7 @@ import { PgPromiseAdapter } from "../src/infra/database/DatabaseConnection";
 import { Regestry } from "../src/infra/di/DI";
 import { MailerGatewayMemory } from "../src/infra/gateway/MailerGateway";
 import { AccountRepositoryDatabase } from "../src/infra/repository/AccountRepository";
+import { PositionRepositoryDatabase } from "../src/infra/repository/PositionRepository";
 import { RideRepositoryDatabase } from "../src/infra/repository/RideRepository";
 
 
@@ -20,6 +21,7 @@ beforeEach(() => {
     Regestry.getInstance().provide("mailerGateway", new MailerGatewayMemory());
     Regestry.getInstance().provide("rideRepository", new RideRepositoryDatabase());
     Regestry.getInstance().provide("databaseConnection", new PgPromiseAdapter());
+    Regestry.getInstance().provide("positionRepository", new PositionRepositoryDatabase());
     signup = new Signup();
     getAccount = new GetAccount();
     requestRide = new RequestRide();
