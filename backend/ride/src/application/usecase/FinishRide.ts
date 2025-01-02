@@ -12,8 +12,7 @@ export default class FinishRide {
         const ride = await this.rideRepository?.getRideById(rideId);
         if(!ride) throw new Error("Ride not found");
         const positions = await this.positionRepository?.getPositionsByRideId(rideId);
-        ride.calculateDistance(positions || []);
-        ride.finish();        
+        ride.finish(positions || []);        
         await this.rideRepository?.updateRide(ride);
     }
 }

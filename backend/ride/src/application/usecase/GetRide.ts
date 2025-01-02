@@ -1,3 +1,4 @@
+import DistanceCalculator from "../../domain/service/DistanceCalculator";
 import { inject } from "../../infra/di/DI";
 import PositionRepository from "../../infra/repository/PositionRepository";
 import RideRepository from "../../infra/repository/RideRepository";
@@ -15,8 +16,7 @@ export default class GetRide {
         if(!ride) throw new Error("Ride not found");
 
         const positions = await this.positionRepository?.getPositionsByRideId(rideId);
-
-        ride.calculateDistance(positions || []);
+        const distance = (ride.getStatus() === "completed") ? ride.getDistance() : DistanceCalculator.calculateByPositions(positions || []);
 
         return {
             rideId: ride.getRideId(),
@@ -28,7 +28,7 @@ export default class GetRide {
             status: ride.getStatus(),
             driverId: ride.getDriverId(),
             positions: positions || [],
-            distance: ride.getDistance(),
+            distance: distance,
             fare: ride.getFare(),
         };
     }

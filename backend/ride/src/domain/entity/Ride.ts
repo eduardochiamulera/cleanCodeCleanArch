@@ -1,3 +1,4 @@
+import Logger from "../../infra/logger/Logger";
 import DistanceCalculator from "../service/DistanceCalculator";
 import Coord from "../vo/Coord";
 import RideStatus, { RideStatusFactory } from "../vo/RideStatus";
@@ -31,7 +32,9 @@ export default class Ride{
         const rideId = UUID.create();
         const status = "requested";
         const date = new Date();
-        return new Ride(rideId.getValue(), passengerId, fromLat, fromLong, toLat, toLong, status, date, 0, 0);
+        const distance = 0;
+        const fare = 0;
+        return new Ride(rideId.getValue(), passengerId, fromLat, fromLong, toLat, toLong, status, date, fare, distance);
     }
 
     getRideId(){
@@ -75,20 +78,12 @@ export default class Ride{
         this.status = status;
     }
 
-    calculateDistance (positions: Position[]) {
-		let distance = 0;
-		for (const [index, position] of positions.entries()) {
-			const nextPosition = positions[index + 1];
-			if (!nextPosition) continue;
-			distance += DistanceCalculator.calculate(position.getCoord(), nextPosition.getCoord());
-		}
-		this.distance = distance;
-	}
-
-    finish(){
+    finish(positions: Position[]){
         if(this.status.value !== "in_progress") throw new Error("Invalid status");
+        const distance = DistanceCalculator.calculateByPositions(positions);
+        this.fare = distance * 2.1;
+        this.distance = distance;
         this.status.finish();
-        this.fare = this.distance * 2.1;
     }
 
     getDistance(){

@@ -1,3 +1,4 @@
+import Position from "../entity/Position";
 import Coord from "../vo/Coord";
 //Regra de negócio independente que não pertence a entity ou a value object
 export default class DistanceCalculator {
@@ -17,4 +18,14 @@ export default class DistanceCalculator {
 		const distance = earthRadius * c;
 		return Math.round(distance);
     }
+
+	static calculateByPositions(positions: Position[]){
+		let distance = 0;
+		for (const [index, position] of positions.entries()) {
+			const nextPosition = positions[index + 1];
+			if (!nextPosition) continue;
+			distance += DistanceCalculator.calculate(position.getCoord(), nextPosition.getCoord());
+		}
+		return distance;
+	}
 }
