@@ -35,9 +35,8 @@ export default class Position {
         return this.rideId.getValue();
     }
 
-    static create(rideId: string, lat: number, long: number){
+    static create(rideId: string, lat: number, long: number, date: Date = new Date()){
         const positionId = UUID.create().getValue();
-        const date = new Date();
         return new Position(positionId, rideId, lat, long, date);
     }
 

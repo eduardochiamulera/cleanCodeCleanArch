@@ -77,6 +77,7 @@ test("Deve atualizar a posição de uma corrida de uma corrida", async function 
         rideId: inputAcceptRide.rideId,
         lat: -27.584905257808835,
         long: -48.545022195325124,
+        date: new Date()
     }
 
     await updatePosition.execute(inputUpdatePosition1);
@@ -84,7 +85,8 @@ test("Deve atualizar a posição de uma corrida de uma corrida", async function 
     const inputUpdatePosition2 = {
         rideId: inputAcceptRide.rideId,
         lat: -27.496887588317275,
-        long: -48.522234807851476
+        long: -48.522234807851476,
+        date: new Date()
     }
     await updatePosition.execute(inputUpdatePosition2);
 
@@ -92,6 +94,7 @@ test("Deve atualizar a posição de uma corrida de uma corrida", async function 
         rideId: inputAcceptRide.rideId,
         lat: -27.584905257808835,
         long: -48.545022195325124,
+        date: new Date()
     }
     await updatePosition.execute(inputUpdatePosition3);
     
@@ -99,7 +102,8 @@ test("Deve atualizar a posição de uma corrida de uma corrida", async function 
     const inputUpdatePosition4 = {
         rideId: inputAcceptRide.rideId,
         lat: -27.496887588317275,
-        long: -48.522234807851476
+        long: -48.522234807851476,
+        date: new Date()
     }
     await updatePosition.execute(inputUpdatePosition4);
 
