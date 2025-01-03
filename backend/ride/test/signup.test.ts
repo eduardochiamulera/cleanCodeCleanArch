@@ -18,6 +18,42 @@ beforeEach(() => {
 	getAccount = new GetAccount();
 });
 
+test("Deve criar a conta de um passageiro com senha em md5", async function () {
+	const input = {
+		name: "John Doe",
+		email: `john.doe${Math.random()}@gmail.com`,
+		cpf: "97456321558",
+		password: "123456",
+		isPassenger: true,
+		passwordType: "md5"
+	};
+	const outputSignup = await signup.execute(input);
+	expect(outputSignup.accountId).toBeDefined();
+	const outputGetAccount = await getAccount.execute(outputSignup.accountId);
+	expect(outputGetAccount.name).toBe(input.name);
+	expect(outputGetAccount.email).toBe(input.email);
+	expect(outputGetAccount.cpf).toBe(input.cpf);
+	expect(outputGetAccount.password).toBe("e10adc3949ba59abbe56e057f20f883e");
+});
+
+test("Deve criar a conta de um passageiro com senha em sha1", async function () {
+	const input = {
+		name: "John Doe",
+		email: `john.doe${Math.random()}@gmail.com`,
+		cpf: "97456321558",
+		password: "123456",
+		isPassenger: true,
+		passwordType: "sha1"
+	};
+	const outputSignup = await signup.execute(input);
+	expect(outputSignup.accountId).toBeDefined();
+	const outputGetAccount = await getAccount.execute(outputSignup.accountId);
+	expect(outputGetAccount.name).toBe(input.name);
+	expect(outputGetAccount.email).toBe(input.email);
+	expect(outputGetAccount.cpf).toBe(input.cpf);
+	expect(outputGetAccount.password).toBe("7c4a8d09ca3762af61e59520943dc26494f8941b");
+});
+
 test("Deve criar a conta de um passageiro", async function () {
 	const input = {
 		name: "John Doe",
@@ -33,7 +69,6 @@ test("Deve criar a conta de um passageiro", async function () {
 	expect(outputGetAccount.email).toBe(input.email);
 	expect(outputGetAccount.cpf).toBe(input.cpf);
 	expect(outputGetAccount.password).toBe(input.password);
-	// expect(outputGetAccount.isPassenger).toBe(input.isPassenger);
 });
 
 test("Não deve criar a conta de um passageiro com nome inválido", async function () {
