@@ -11,7 +11,6 @@ export default class GetAccount {
 
 		if(!account) throw new Error("Account not found");
 
-		//DTO - Data Transfer object
 		return {
 			accountId: account.getAccountId(),
 			name: account.getName(),

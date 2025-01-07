@@ -11,22 +11,25 @@ export default class ProcessPayment {
     @inject("paymentGateway")
     paymentGateway!: PaymentGateway;
 
-    async execute(input: Input): Promise<void> {
+    async execute(input: Input): Promise<Output> {
         console.log("processPayment", input);
         const transaction = TransactionFactory.create(input.rideId, input.amount);
-        try{
-            //gateway externo
-            const payment = await this.paymentGateway.execute({ value: input.amount, creditCard: { ccv: 123, date: "042034", name: "John Doe" }});
+        const payment = await this.paymentGateway.execute({ value: input.amount, creditCard: { ccv: 123, date: "042034", name: "John Doe" }});
 
-            if(payment.success){
-                transaction.pay();
-            }
+        if(payment.success){
+            transaction.pay();
+        }
 
-            await this.transactionRepository.saveTransaction(transaction);
-        }catch(error: any){
-            Logger.getInstance().debug("error", error);
+        await this.transactionRepository.saveTransaction(transaction);
+
+        return {
+            transactionId: transaction.getTransactionId()
         }
     }
+}
+
+type Output = {
+    transactionId: string;
 }
 
 type Input = {

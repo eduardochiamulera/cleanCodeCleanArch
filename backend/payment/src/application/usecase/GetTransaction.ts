@@ -6,20 +6,15 @@ export default class GetTransaction {
     @inject("transactionRepository")
     transactionRepository!: TransactionRepository;
 
-    async execute (input: Input) : Promise<Output> {
-        const transaction = await this.transactionRepository?.getTransactionByRideId(input.rideId);
+    async execute (transactionId: string) : Promise<Output> {
+        const transaction = await this.transactionRepository?.getTransactionById(transactionId);
         if(!transaction) throw new Error("Transaction not found");
-
         return {
             rideId: transaction.getRideId(),
             amount: transaction.getAmount(),
             status: transaction.getStatus()
         };
     }
-}
-
-type Input = {
-    rideId: string
 }
 
 type Output = {

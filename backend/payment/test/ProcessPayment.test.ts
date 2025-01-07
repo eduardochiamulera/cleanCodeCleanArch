@@ -1,31 +1,12 @@
-import AcceptRide from "../src/application/usecase/AcceptRide";
-import FinishRide from "../src/application/usecase/FinishRide";
-import GetAccount from "../src/application/usecase/GetAccount";
 import GetRide from "../src/application/usecase/GetRide";
 import GetTransaction from "../src/application/usecase/GetTransaction";
 import ProcessPayment from "../src/application/usecase/ProcessPayment";
-import RequestRide from "../src/application/usecase/RequestRide";
-import Signup from "../src/application/usecase/Signup";
-import StartRide from "../src/application/usecase/StartRide";
-import UpdatePosition from "../src/application/usecase/UpdatePosition";
 import { PgPromiseAdapter } from "../src/infra/database/DatabaseConnection";
 import { Regestry } from "../src/infra/di/DI";
-import { MailerGatewayMemory } from "../src/infra/gateway/MailerGateway";
 import { ExternalPaymetGateway } from "../src/infra/gateway/PaymentGateway";
 import Mediator from "../src/infra/mediator/Mediator";
-import { AccountRepositoryDatabase } from "../src/infra/repository/AccountRepository";
-import { PositionRepositoryDatabase } from "../src/infra/repository/PositionRepository";
-import { RideRepositoryDatabase } from "../src/infra/repository/RideRepository";
 import { TransactionRepositoryDatabase } from "../src/infra/repository/TransactionRepository";
 
-let signup: Signup;
-let getAccount: GetAccount;
-let requestRide: RequestRide;
-let getRide: GetRide;
-let acceptRide: AcceptRide;
-let startRide: StartRide;
-let updatePosition: UpdatePosition;
-let finishRide: FinishRide;
 let processPayment: ProcessPayment;
 let getTransaction: GetTransaction;
 
@@ -36,21 +17,9 @@ beforeEach(() => {
         await processPayment.execute(data);
     })
     Regestry.getInstance().provide("mediator", mediator);
-    Regestry.getInstance().provide("accountRepository", new AccountRepositoryDatabase());
-    Regestry.getInstance().provide("mailerGateway", new MailerGatewayMemory());
-    Regestry.getInstance().provide("rideRepository", new RideRepositoryDatabase());
     Regestry.getInstance().provide("databaseConnection", new PgPromiseAdapter());
-    Regestry.getInstance().provide("positionRepository", new PositionRepositoryDatabase());
     Regestry.getInstance().provide("paymentGateway", new ExternalPaymetGateway());
     Regestry.getInstance().provide("transactionRepository", new TransactionRepositoryDatabase());
-    signup = new Signup();
-    getAccount = new GetAccount();
-    requestRide = new RequestRide();
-    getRide = new GetRide();
-    acceptRide = new AcceptRide();
-    startRide = new StartRide();
-    finishRide = new FinishRide();
-    updatePosition = new UpdatePosition();
     processPayment = new ProcessPayment();
     getTransaction = new GetTransaction();
 });
