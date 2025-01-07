@@ -35,3 +35,17 @@ lat numeric,
 long numeric,
 date timestamp
 );
+
+create table ccca.transaction (
+
+transaction_id uuid primary key,
+
+ride_id uuid,
+
+amount numeric,
+
+date timestamp,
+
+status text
+
+);

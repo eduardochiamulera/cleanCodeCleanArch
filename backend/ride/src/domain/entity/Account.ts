@@ -29,9 +29,8 @@ export default class Account{
 
     //static factory method
     static create (name: string, email: string, cpf: string, carPlate: string, 
-        password: string, isPassenger: boolean, isDriver: boolean, passwordType: string = "plaintext" ){
+        password: string, isPassenger: boolean, isDriver: boolean, passwordType: string = "textplain" ){
         const accountId = UUID.create();
-        console.log("passwordtype", passwordType)
         const passwordValue = PasswordFactory.create(passwordType, password);
         return new Account(accountId.getValue(), name, email, cpf, carPlate, passwordValue.getValue(), isPassenger, isDriver, passwordValue.type);
     }

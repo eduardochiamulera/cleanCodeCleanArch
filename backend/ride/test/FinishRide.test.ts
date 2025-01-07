@@ -281,43 +281,40 @@ test("Deve finalizar uma corrida em horário noturno", async function () {
     expect(outputGetRide.status).toBe("completed");
 });
 
-// test("Não deve finalizar uma corrida com status accepted", async function () {
-//     const inputSignupPassenger = {
-//         name: "John Doe",
-//         email: `john.doe${Math.random()}@gmail.com`,
-//         cpf: "97456321558",
-//         password: "123456",
-//         isPassenger: true
-//     };
-//     const outputSignupPassenger = await signup.execute(inputSignupPassenger);
+test("Não deve finalizar uma corrida com status accepted", async function () {
+    const inputSignupPassenger = {
+        name: "John Doe",
+        email: `john.doe${Math.random()}@gmail.com`,
+        cpf: "97456321558",
+        password: "123456",
+        isPassenger: true
+    };
+    const outputSignupPassenger = await signup.execute(inputSignupPassenger);
+    const inputSignupDriver = {
+        name: "John Doe",
+        email: `john.doe${Math.random()}@gmail.com`,
+        cpf: "97456321558",
+        password: "123456",
+        isDriver: true,
+        carPlate: "AAA9999"
+    }
+    const outputSignupDriver = await signup.execute(inputSignupDriver);
+    const inputRequestRide = {
+        passengerId: outputSignupPassenger.accountId,
+        fromLat: -27.584905257808835,
+        fromLong: -48.545022195325124,
+        toLat: -27.496887588317275,
+        toLong: -48.522234807851476
+    };
+    const outputRequestRide = await requestRide.execute(inputRequestRide);
+    const inputAcceptRide = {
+        driverId: outputSignupDriver.accountId,
+        rideId: outputRequestRide.rideId
+    }
+    await acceptRide.execute(inputAcceptRide);
 
-//     const inputSignupDriver = {
-//         name: "John Doe",
-//         email: `john.doe${Math.random()}@gmail.com`,
-//         cpf: "97456321558",
-//         password: "123456",
-//         isDriver: true,
-//         carPlate: "AAA9999"
-//     }
-//     const outputSignupDriver = await signup.execute(inputSignupDriver);
-
-//     const inputRequestRide = {
-//         passengerId: outputSignupPassenger.accountId,
-//         fromLat: -27.584905257808835,
-//         fromLong: -48.545022195325124,
-//         toLat: -27.496887588317275,
-//         toLong: -48.522234807851476
-//     };
-//     const outputRequestRide = await requestRide.execute(inputRequestRide);
-
-//     const inputAcceptRide = {
-//         driverId: outputSignupDriver.accountId,
-//         rideId: outputRequestRide.rideId
-//     }
-//     await acceptRide.execute(inputAcceptRide);
-
-//     expect(async () => await finishRide.execute(inputAcceptRide.rideId)).rejects.toThrow(new Error("Invalid status"));
-// });
+    expect(async () => await finishRide.execute(inputAcceptRide.rideId)).rejects.toThrow(new Error("Invalid status"));
+});
 
 afterEach(async () => {
     const connection = Regestry.getInstance().inject("databaseConnection");
