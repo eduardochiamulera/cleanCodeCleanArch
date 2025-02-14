@@ -4,6 +4,7 @@ import RequestRide from "../src/application/usecase/RequestRide";
 import StartRide from "../src/application/usecase/StartRide";
 import { PgPromiseAdapter } from "../src/infra/database/DatabaseConnection";
 import { Regestry } from "../src/infra/di/DI";
+import AccountGateway from "../src/infra/gateway/AccountGateway";
 import { PositionRepositoryDatabase } from "../src/infra/repository/PositionRepository";
 import { RideRepositoryDatabase } from "../src/infra/repository/RideRepository";
 
@@ -11,12 +12,15 @@ let requestRide: RequestRide;
 let getRide: GetRide;
 let acceptRide: AcceptRide;
 let startRide: StartRide;
+let accountGateway: AccountGateway;
 
 // Integration Narrow -> Broad
 beforeEach(() => {
+    accountGateway = new AccountGateway();
     Regestry.getInstance().provide("rideRepository", new RideRepositoryDatabase());
     Regestry.getInstance().provide("databaseConnection", new PgPromiseAdapter());
     Regestry.getInstance().provide("positionRepository", new PositionRepositoryDatabase());
+    Regestry.getInstance().provide("accountGateway", accountGateway);
     requestRide = new RequestRide();
     getRide = new GetRide();
     acceptRide = new AcceptRide();
@@ -31,7 +35,7 @@ test("Deve iniciar uma corrida", async function () {
         password: "123456",
         isPassenger: true
     };
-    const outputSignup = await signup.execute(inputSignup);
+    const outputSignup = await accountGateway.signup(inputSignup);
     outputSignup.accountId;
     const inputRequestRide = {
         passengerId: outputSignup.accountId,
@@ -50,7 +54,7 @@ test("Deve iniciar uma corrida", async function () {
         isDriver: true,
         carPlate: "AAA9999"
     }
-    const outputSignupDriver = await signup.execute(inputSignupDriver);
+    const outputSignupDriver = await accountGateway.signup(inputSignupDriver);
 
     const inputAcceptRide = {
         driverId: outputSignupDriver.accountId,
@@ -75,7 +79,7 @@ test("Não deve iniciar uma corrida que não foi aceita", async function () {
         password: "123456",
         isPassenger: true
     };
-    const outputSignup = await signup.execute(inputSignup);
+    const outputSignup = await accountGateway.signup(inputSignup);
     outputSignup.accountId;
     const inputRequestRide = {
         passengerId: outputSignup.accountId,
@@ -95,7 +99,7 @@ test("Não deve iniciar uma corrida que não foi aceita", async function () {
         carPlate: "AAA9999"
     }
     
-    await signup.execute(inputSignupDriver);
+    await accountGateway.signup(inputSignupDriver);
     expect(async () => await startRide.execute(outputRequestRide.rideId)).rejects.toThrow(new Error("Ride already started"));
 });
 

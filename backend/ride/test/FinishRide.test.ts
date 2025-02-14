@@ -6,6 +6,8 @@ import StartRide from "../src/application/usecase/StartRide";
 import UpdatePosition from "../src/application/usecase/UpdatePosition";
 import { PgPromiseAdapter } from "../src/infra/database/DatabaseConnection";
 import { Regestry } from "../src/infra/di/DI";
+import AccountGateway from "../src/infra/gateway/AccountGateway";
+import PaymentGateway from "../src/infra/gateway/PaymentGateway";
 import Mediator from "../src/infra/mediator/Mediator";
 import { PositionRepositoryDatabase } from "../src/infra/repository/PositionRepository";
 import { RideRepositoryDatabase } from "../src/infra/repository/RideRepository";
@@ -16,10 +18,12 @@ let acceptRide: AcceptRide;
 let startRide: StartRide;
 let updatePosition: UpdatePosition;
 let finishRide: FinishRide;
+let accountGateway: AccountGateway;
 
 // Integration Narrow -> Broad
 beforeEach(() => {
     const mediator = new Mediator();
+    accountGateway = new AccountGateway();
     mediator.register("rideCompleted", async function (data: any) {
         //await processPayment.execute(data);
     })
@@ -27,6 +31,7 @@ beforeEach(() => {
     Regestry.getInstance().provide("rideRepository", new RideRepositoryDatabase());
     Regestry.getInstance().provide("databaseConnection", new PgPromiseAdapter());
     Regestry.getInstance().provide("positionRepository", new PositionRepositoryDatabase());
+    Regestry.getInstance().provide("accountGateway", accountGateway);
     requestRide = new RequestRide();
     getRide = new GetRide();
     acceptRide = new AcceptRide();
@@ -43,7 +48,7 @@ test("Deve finalizar uma corrida em horário comercial", async function () {
         password: "123456",
         isPassenger: true
     };
-    const outputSignupPassenger = await signup.execute(inputSignupPassenger);
+    const outputSignupPassenger = await accountGateway.signup(inputSignupPassenger);
 
     const inputSignupDriver = {
         name: "John Doe",
@@ -53,7 +58,7 @@ test("Deve finalizar uma corrida em horário comercial", async function () {
         isDriver: true,
         carPlate: "AAA9999"
     }
-    const outputSignupDriver = await signup.execute(inputSignupDriver);
+    const outputSignupDriver = await accountGateway.signup(inputSignupDriver);
 
     const inputRequestRide = {
         passengerId: outputSignupPassenger.accountId,
@@ -121,7 +126,7 @@ test("Deve finalizar uma corrida no primeiro dia do mês", async function () {
         password: "123456",
         isPassenger: true
     };
-    const outputSignupPassenger = await signup.execute(inputSignupPassenger);
+    const outputSignupPassenger = await accountGateway.signup(inputSignupPassenger);
 
     const inputSignupDriver = {
         name: "John Doe",
@@ -131,7 +136,7 @@ test("Deve finalizar uma corrida no primeiro dia do mês", async function () {
         isDriver: true,
         carPlate: "AAA9999"
     }
-    const outputSignupDriver = await signup.execute(inputSignupDriver);
+    const outputSignupDriver = await accountGateway.signup(inputSignupDriver);
 
     const inputRequestRide = {
         passengerId: outputSignupPassenger.accountId,
@@ -199,7 +204,7 @@ test("Deve finalizar uma corrida em horário noturno", async function () {
         password: "123456",
         isPassenger: true
     };
-    const outputSignupPassenger = await signup.execute(inputSignupPassenger);
+    const outputSignupPassenger = await accountGateway.signup(inputSignupPassenger);
 
     const inputSignupDriver = {
         name: "John Doe",
@@ -209,7 +214,7 @@ test("Deve finalizar uma corrida em horário noturno", async function () {
         isDriver: true,
         carPlate: "AAA9999"
     }
-    const outputSignupDriver = await signup.execute(inputSignupDriver);
+    const outputSignupDriver = await accountGateway.signup(inputSignupDriver);
 
     const inputRequestRide = {
         passengerId: outputSignupPassenger.accountId,
@@ -277,7 +282,7 @@ test("Não deve finalizar uma corrida com status accepted", async function () {
         password: "123456",
         isPassenger: true
     };
-    const outputSignupPassenger = await signup.execute(inputSignupPassenger);
+    const outputSignupPassenger = await accountGateway.signup(inputSignupPassenger);
     const inputSignupDriver = {
         name: "John Doe",
         email: `john.doe${Math.random()}@gmail.com`,
@@ -286,7 +291,7 @@ test("Não deve finalizar uma corrida com status accepted", async function () {
         isDriver: true,
         carPlate: "AAA9999"
     }
-    const outputSignupDriver = await signup.execute(inputSignupDriver);
+    const outputSignupDriver = await accountGateway.signup(inputSignupDriver);
     const inputRequestRide = {
         passengerId: outputSignupPassenger.accountId,
         fromLat: -27.584905257808835,

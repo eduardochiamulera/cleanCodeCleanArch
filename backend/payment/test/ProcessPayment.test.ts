@@ -1,4 +1,3 @@
-import GetRide from "../src/application/usecase/GetRide";
 import GetTransaction from "../src/application/usecase/GetTransaction";
 import ProcessPayment from "../src/application/usecase/ProcessPayment";
 import { PgPromiseAdapter } from "../src/infra/database/DatabaseConnection";
@@ -25,94 +24,17 @@ beforeEach(() => {
 });
 
 test("Deve processar o pagamento de uma corrida", async function () {
-    const inputSignupPassenger = {
-        name: "John Doe",
-        email: `john.doe${Math.random()}@gmail.com`,
-        cpf: "97456321558",
-        password: "123456",
-        isPassenger: true
-    };
-    const outputSignupPassenger = await signup.execute(inputSignupPassenger);
-
-    const inputSignupDriver = {
-        name: "John Doe",
-        email: `john.doe${Math.random()}@gmail.com`,
-        cpf: "97456321558",
-        password: "123456",
-        isDriver: true,
-        carPlate: "AAA9999"
-    }
-    const outputSignupDriver = await signup.execute(inputSignupDriver);
-
-    const inputRequestRide = {
-        passengerId: outputSignupPassenger.accountId,
-        fromLat: -27.584905257808835,
-        fromLong: -48.545022195325124,
-        toLat: -27.496887588317275,
-        toLong: -48.522234807851476,
-    };
-    const outputRequestRide = await requestRide.execute(inputRequestRide);
-
-    const inputAcceptRide = {
-        driverId: outputSignupDriver.accountId,
-        rideId: outputRequestRide.rideId
-    }
-    await acceptRide.execute(inputAcceptRide);
-
-    await startRide.execute(inputAcceptRide.rideId);
-
-    const inputUpdatePosition1 = {
-        rideId: inputAcceptRide.rideId,
-        lat: -27.584905257808835,
-        long: -48.545022195325124,
-        date: new Date("2023-03-05T10:00:00")
-    }
-
-    await updatePosition.execute(inputUpdatePosition1);
-
-    const inputUpdatePosition2 = {
-        rideId: inputAcceptRide.rideId,
-        lat: -27.496887588317275,
-        long: -48.522234807851476,
-        date: new Date("2023-03-05T10:00:00")
-    }
-    await updatePosition.execute(inputUpdatePosition2);
-
-    const inputUpdatePosition3 = {
-        rideId: inputAcceptRide.rideId,
-        lat: -27.584905257808835,
-        long: -48.545022195325124,
-        date: new Date("2023-03-05T10:00:00")
-    }
-    await updatePosition.execute(inputUpdatePosition3);
-    
-    const inputUpdatePosition4 = {
-        rideId: inputAcceptRide.rideId,
-        lat: -27.496887588317275,
-        long: -48.522234807851476,
-        date: new Date("2023-03-05T10:00:00")
-    }
-    await updatePosition.execute(inputUpdatePosition4);
-
-    await finishRide.execute(inputAcceptRide.rideId);
-
-    const outputGetRide = await getRide.execute(inputAcceptRide.rideId);
-
     const inputProcessPayment = {
-        rideId: inputAcceptRide.rideId,
-        amount: outputGetRide.fare
+        rideId: crypto.randomUUID(),
+        amount: 63
     }
 
-    await processPayment.execute(inputProcessPayment);
+    const outputTransaction = await processPayment.execute(inputProcessPayment);
 
-    const inputTransaction = { 
-        rideId: inputAcceptRide.rideId
-    }
-
-    const transaction = await getTransaction.execute(inputTransaction);
+    const transaction = await getTransaction.execute(outputTransaction.transactionId);
 
     expect(transaction.amount).toBe(63);
-    expect(transaction.rideId).toBe(inputAcceptRide.rideId);
+    expect(transaction.rideId).toBe(inputProcessPayment.rideId);
     expect(transaction.status).toBe("payed");
     
 });

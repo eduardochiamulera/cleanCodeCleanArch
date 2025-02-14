@@ -1,29 +1,23 @@
-import GetAccount from "../src/application/usecase/GetAccount";
 import GetRide from "../src/application/usecase/GetRide";
 import RequestRide from "../src/application/usecase/RequestRide";
-import Signup from "../src/application/usecase/Signup";
 import { PgPromiseAdapter } from "../src/infra/database/DatabaseConnection";
 import { Regestry } from "../src/infra/di/DI";
-import { MailerGatewayMemory } from "../src/infra/gateway/MailerGateway";
-import { AccountRepositoryDatabase } from "../src/infra/repository/AccountRepository";
+import AccountGateway from "../src/infra/gateway/AccountGateway";
 import { PositionRepositoryDatabase } from "../src/infra/repository/PositionRepository";
 import { RideRepositoryDatabase } from "../src/infra/repository/RideRepository";
 
 
-let signup: Signup;
-let getAccount: GetAccount;
 let requestRide: RequestRide;
 let getRide: GetRide;
+let accountGateway: AccountGateway;
 
 // Integration Narrow -> Broad
 beforeEach(() => {
-    Regestry.getInstance().provide("accountRepository", new AccountRepositoryDatabase());
-    Regestry.getInstance().provide("mailerGateway", new MailerGatewayMemory());
+    accountGateway = new AccountGateway();
     Regestry.getInstance().provide("rideRepository", new RideRepositoryDatabase());
     Regestry.getInstance().provide("databaseConnection", new PgPromiseAdapter());
     Regestry.getInstance().provide("positionRepository", new PositionRepositoryDatabase());
-    signup = new Signup();
-    getAccount = new GetAccount();
+    Regestry.getInstance().provide("accountGateway", accountGateway);
     requestRide = new RequestRide();
     getRide = new GetRide();
 });
@@ -36,7 +30,7 @@ test("Deve solicitar uma corrida", async function () {
         password: "123456",
         isPassenger: true
     };
-    const outputSignup = await signup.execute(inputSignup);
+    const outputSignup = await accountGateway.signup(inputSignup);
     outputSignup.accountId;
     const inputRequestRide = {
         passengerId: outputSignup.accountId,
@@ -66,7 +60,7 @@ test("Não deve solicitar uma corrida se a conta não for de um passageiro", asy
         isDriver: true,
         carPlate: "AAA9999"
     };
-    const outputSignup = await signup.execute(inputSignup);
+    const outputSignup = await accountGateway.signup(inputSignup);
     outputSignup.accountId;
     const inputRequestRide = {
         passengerId: outputSignup.accountId,
@@ -86,7 +80,7 @@ test("Não deve solicitar uma corrida se tem uma pendente", async function () {
         password: "123456",
         isPassenger: true
     };
-    const outputSignup = await signup.execute(inputSignup);
+    const outputSignup = await accountGateway.signup(inputSignup);
     outputSignup.accountId;
     const inputRequestRide = {
         passengerId: outputSignup.accountId,
